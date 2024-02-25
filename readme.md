@@ -2,8 +2,10 @@
 - [x] go八股
 - [x] 计算机网络八股
 - [x] 操作系统八股
-- [ ] Redis八股(重要) 
-- [ ] Mysql八股
+- [x] Redis八股(重要) 
+- [x] Mysql八股
+- [x] kafka八股(重要)
+- [ ] elasticsearch八股(暂不考虑)
+- [ ] Mongo八股
+- [ ] 6.824准备
 - [ ] 算法
-- [ ] kafka八股(重要)
-- [ ] elasticsearch八股
