@@ -1,13 +1,9 @@
 Prism.languages.properties = {
 	'comment': /^[ \t]*[#!].*$/m,
-	'value': {
+	'attr-value': {
 		pattern: /(^[ \t]*(?:\\(?:\r\n|[\s\S])|[^\\\s:=])+(?: *[=:] *(?! )| ))(?:\\(?:\r\n|[\s\S])|[^\\\r\n])+/m,
-		lookbehind: true,
-		alias: 'attr-value'
+		lookbehind: true
 	},
-	'key': {
-		pattern: /^[ \t]*(?:\\(?:\r\n|[\s\S])|[^\\\s:=])+(?= *[=:]| )/m,
-		alias: 'attr-name'
-	},
+	'attr-name': /^[ \t]*(?:\\(?:\r\n|[\s\S])|[^\\\s:=])+(?= *[=:]| )/m,
 	'punctuation': /[=:]/
 };

@@ -1,8 +1,4 @@
----
-title: Golang
-author: Lansong
-date: '2024-02-25'
----
+# Golang
 
 1.chan中无缓冲和有缓冲的区别
 

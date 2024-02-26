@@ -1,0 +1,93 @@
+.custom-block
+  position relative
+  border-radius 8px
+  .custom-block-title
+    font-weight 600
+    margin-bottom -0.4rem
+   &.info, &.tip, &.warning, &.danger
+    padding .1rem 1.5rem
+    border-left-width .5rem
+    border-left-style solid
+    margin 1rem 0
+  &.info
+    border-color $badgeInfoColor
+    background-color #f8f8f8
+  &.tip
+    border-color $badgeTipColor
+    background-color #f8f8f8
+  &.warning
+    border-color $badgeWarningColor
+    background-color #f8f8f8
+    color darken(#ffe564, 70%)
+    .custom-block-title
+      color #222
+    a
+      color $textColor
+  &.danger
+    border-color $badgeErrorColor
+    background-color #f8f8f8
+    color darken(red, 70%)
+    .custom-block-title
+      color #222
+    a
+      color $textColor
+  &.details
+    display block
+    position relative
+    border-radius 2px
+    margin 1.6em 0
+    padding 1.6em
+    background-color #eee
+    h4
+      margin-top 0
+    figure, p
+      &:last-child
+        margin-bottom 0
+        padding-bottom 0
+    summary
+      outline none
+      cursor pointer
+  &.theorem
+    margin 1rem 0
+    padding .1rem 1.5rem
+    border-radius 0.4rem
+    background-color #f0f4f8
+    .title
+      font-weight bold
+  &.right
+    color transparentify($textColor, 0.4)
+    font-size 0.9rem
+    text-align right
+
+[data-theme = dark ] & 
+  .custom-block
+    &.info
+      border-color: $dark[--badgeInfoColor]
+      background-color rgba(243,245,247,.2)
+    &.tip
+      border-color: $dark[--badgeTipColor]
+      background-color rgba(243,245,247,.2)
+    &.warning
+      border-color: $dark[--badgeWarningColor]
+      background-color rgba(243,245,247,.2)
+      a
+        color: $dark[--textColor]
+      .custom-block-title
+        color #c5c5c5
+      p
+        color #e7c000
+    &.danger
+      border-color: $dark[--badgeErrorColor]
+      background-color rgba(243,245,247,.2)
+      a
+        color: $dark[--textColor]
+      .custom-block-title
+        color #c5c5c5
+      p
+        color #cf6679
+    &.details
+      background-color #202124
+    &.theorem
+      background-color #27272b
+    &.right
+      color: transparentify($dark[--textColor], 0.8)

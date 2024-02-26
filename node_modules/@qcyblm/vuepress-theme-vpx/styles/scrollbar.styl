@@ -1,0 +1,54 @@
+// 滚动条样式
+@media (min-width: $MQMobile)
+  ::-webkit-scrollbar
+    width 6px
+    height 5px
+  ::-webkit-scrollbar-track-piece
+    background-color $scrollbarBgColor
+    -webkit-border-radius 3px
+    -webkit-box-shadow inset 0 0 6px rgba(0, 0, 0, 0.3)
+  ::-webkit-scrollbar-thumb:vertical
+    height 5px
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(.44,$scrollbarBottomColor),
+      color-stop(.72,$scrollbarTopColor)
+    )
+    transition 0.3s ease-in-out
+    -webkit-border-radius 3px
+    -webkit-box-shadow inset 0 0 6px rgba(0, 0, 0, 0.3)
+  ::-webkit-scrollbar-thumb:horizontal
+    width 5px
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(.44,$scrollbarBottomColor),
+      color-stop(.72,$scrollbarTopColor)
+    )
+    transition 0.3s ease-in-out
+    -webkit-border-radius 3px
+    -webkit-box-shadow inset 0 0 6px rgba(0, 0, 0, 0.3)
+
+// 暗黑模式
+[data-theme = dark ] &
+  ::-webkit-scrollbar-track-piece
+    background-color: $dark[--scrollbarBgColor]
+  ::-webkit-scrollbar-thumb:vertical
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(.44,$dark[--scrollbarBottomColor]),
+      color-stop(.72,$dark[--scrollbarTopColor])
+    )
+  ::-webkit-scrollbar-thumb:horizontal
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(.44,$dark[--scrollbarBottomColor]),
+      color-stop(.72,$dark[--scrollbarTopColor])
+    )

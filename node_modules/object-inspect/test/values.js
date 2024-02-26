@@ -2,7 +2,6 @@
 
 var inspect = require('../');
 var test = require('tape');
-var mockProperty = require('mock-property');
 var hasSymbols = require('has-symbols/shams')();
 var hasToStringTag = require('has-tostringtag/shams')();
 
@@ -24,9 +23,10 @@ test('arrays with properties', function (t) {
 
 test('has', function (t) {
     t.plan(1);
-    t.teardown(mockProperty(Object.prototype, 'hasOwnProperty', { 'delete': true }));
-
+    var has = Object.prototype.hasOwnProperty;
+    delete Object.prototype.hasOwnProperty;
     t.equal(inspect({ a: 1, b: 2 }), '{ a: 1, b: 2 }');
+    Object.prototype.hasOwnProperty = has; // eslint-disable-line no-extend-native
 });
 
 test('indexOf seen', function (t) {

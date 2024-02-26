@@ -1,8 +1,4 @@
----
-title: Mysql
-author: Lansong
-date: '2024-02-25'
----
+# Mysql
 
 1.Mysql的表空间结构
 <details>

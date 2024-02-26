@@ -10,11 +10,11 @@ Prism.languages.gedcom = {
 			}
 		}
 	},
-	'record': {
+	'tag': {
 		// Preceded by level and optional pointer
 		pattern: /(^[\t ]*\d+ +(?:@\w[\w!"$%&'()*+,\-./:;<=>?[\\\]^`{|}~\x80-\xfe #]*@ +)?)\w+/m,
 		lookbehind: true,
-		alias: 'tag'
+		alias: 'string'
 	},
 	'level': {
 		pattern: /(^[\t ]*)\d+/m,

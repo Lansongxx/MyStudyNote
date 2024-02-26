@@ -1,8 +1,4 @@
----
-title: Redis
-author: Lansong
-date: '2024-02-25'
----
+# Redis
 
 1.Redis是什么？
 <details>

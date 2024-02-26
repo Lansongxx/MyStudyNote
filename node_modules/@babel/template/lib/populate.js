@@ -4,7 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = populatePlaceholders;
+
 var _t = require("@babel/types");
+
 const {
   blockStatement,
   cloneNode,
@@ -16,8 +18,10 @@ const {
   stringLiteral,
   validate
 } = _t;
+
 function populatePlaceholders(metadata, replacements) {
   const ast = cloneNode(metadata.ast);
+
   if (replacements) {
     metadata.placeholders.forEach(placeholder => {
       if (!Object.prototype.hasOwnProperty.call(replacements, placeholder.name)) {
@@ -34,6 +38,7 @@ function populatePlaceholders(metadata, replacements) {
       }
     });
   }
+
   metadata.placeholders.slice().reverse().forEach(placeholder => {
     try {
       applyReplacement(placeholder, ast, replacements && replacements[placeholder.name] || null);
@@ -44,6 +49,7 @@ function populatePlaceholders(metadata, replacements) {
   });
   return ast;
 }
+
 function applyReplacement(placeholder, ast, replacement) {
   if (placeholder.isDuplicate) {
     if (Array.isArray(replacement)) {
@@ -52,15 +58,18 @@ function applyReplacement(placeholder, ast, replacement) {
       replacement = cloneNode(replacement);
     }
   }
+
   const {
     parent,
     key,
     index
   } = placeholder.resolve(ast);
+
   if (placeholder.type === "string") {
     if (typeof replacement === "string") {
       replacement = stringLiteral(replacement);
     }
+
     if (!replacement || !isStringLiteral(replacement)) {
       throw new Error("Expected string substitution");
     }
@@ -80,6 +89,7 @@ function applyReplacement(placeholder, ast, replacement) {
         if (typeof replacement === "string") {
           replacement = identifier(replacement);
         }
+
         if (!isStatement(replacement)) {
           replacement = expressionStatement(replacement);
         }
@@ -89,20 +99,24 @@ function applyReplacement(placeholder, ast, replacement) {
     if (typeof replacement === "string") {
       replacement = identifier(replacement);
     }
+
     if (index === undefined) throw new Error("Assertion failure.");
   } else {
     if (typeof replacement === "string") {
       replacement = identifier(replacement);
     }
+
     if (Array.isArray(replacement)) {
       throw new Error("Cannot replace single expression with an array.");
     }
   }
+
   if (index === undefined) {
     validate(parent, key, replacement);
     parent[key] = replacement;
   } else {
     const items = parent[key].slice();
+
     if (placeholder.type === "statement" || placeholder.type === "param") {
       if (replacement == null) {
         items.splice(index, 1);
@@ -114,9 +128,8 @@ function applyReplacement(placeholder, ast, replacement) {
     } else {
       items[index] = replacement;
     }
+
     validate(parent, key, items);
     parent[key] = items;
   }
 }
-
-//# sourceMappingURL=populate.js.map

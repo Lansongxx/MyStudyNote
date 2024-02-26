@@ -1,8 +1,9 @@
-import { Replacement, SourceAndMapMixin } from ".";
-import Source = require("./Source");
+import { Replacement, SourceAndMapMixin } from '.';
+import Source = require('./Source');
 
 /**
  * Decorates a Source with replacements and insertions of source code.
+ *
  */
 declare class ReplaceSource extends Source implements SourceAndMapMixin {
     replacements: Replacement[];

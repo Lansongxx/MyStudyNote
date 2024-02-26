@@ -1,8 +1,4 @@
----
-title: Kafka
-author: Lansong
-date: '2024-02-25'
----
+# Kafka
 
 1.什么是kafka
 <details>

@@ -39,8 +39,8 @@
 			}
 
 			var o = {
-				// Store original element so we can restore it after highlighting
-				element: element,
+				// Clone the original tag to keep all attributes
+				clone: element.cloneNode(false),
 				posOpen: pos
 			};
 			data.push(o);
@@ -96,13 +96,12 @@
 					}
 
 					if (nodeState.nodeStart && nodeState.nodeEnd) {
-						// Select the range and wrap it with the element
+						// Select the range and wrap it with the clone
 						var range = document.createRange();
 						range.setStart(nodeState.nodeStart, nodeState.nodeStartPos);
 						range.setEnd(nodeState.nodeEnd, nodeState.nodeEndPos);
-						nodeState.node.element.innerHTML = '';
-						nodeState.node.element.appendChild(range.extractContents());
-						range.insertNode(nodeState.node.element);
+						nodeState.node.clone.appendChild(range.extractContents());
+						range.insertNode(nodeState.node.clone);
 						range.detach();
 
 						// Process is over

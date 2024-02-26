@@ -1,4 +1,4 @@
-# call-me-maybe [![Continuous Release](https://github.com/limulus/call-me-maybe/actions/workflows/continuous-release.yaml/badge.svg)](https://github.com/limulus/call-me-maybe/actions/workflows/continuous-release.yaml)
+# call-me-maybe [![Build Status](https://travis-ci.org/limulus/call-me-maybe.svg?branch=master)](https://travis-ci.org/limulus/call-me-maybe)
 
 Let your JS API users either give you a callback or receive a promise.
 
@@ -23,4 +23,4 @@ If the callback `cb` is truthy, returns `undefined` and will call `cb` when `pro
   - If `promise` is fulfilled, then it is called with the result of the promise: `cb(null, result)`
   - If `promise` is rejected, then it is called with the rejection error: `cb(err)`
 
-If `cb` is falsey, then `promise` is returned.
+If `cb` is falsey, then `promise` is retuned.

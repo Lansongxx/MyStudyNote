@@ -1,8 +1,4 @@
----
-title: MongoDB
-author: Lansong
-date: '2024-02-25'
----
+# MongoDB
 
 1.Mongo是什么?
 <details>
