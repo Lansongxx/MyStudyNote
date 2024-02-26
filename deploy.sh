@@ -7,7 +7,7 @@ set -e
 yarn build
 
 # 进入生成的文件夹
-cd docs/.vuepress/dist
+mv docs/.vuepress/dist ./dist
 
 git add -A
 git commit -m 'deploy'
