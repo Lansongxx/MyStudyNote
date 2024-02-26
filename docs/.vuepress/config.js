@@ -36,7 +36,7 @@ module.exports = {
             {
                 title: "操作系统",
                 path: '/handbook/操作系统',
-                collapsable: false, // 不折叠
+                collapsable: true, // 不折叠
             },
             {
                 title: "Redis",
