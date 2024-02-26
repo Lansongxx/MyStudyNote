@@ -3,6 +3,7 @@ module.exports = {
     lang: "zh-CN",
     title: '八股速记',
     description: '面试前快速背诵八股',
+    base: '/MyStudyNote/',
     locales: {
         '/': {
             lang: 'zh-CN'
