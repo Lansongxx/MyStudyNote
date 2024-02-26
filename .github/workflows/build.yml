@@ -27,7 +27,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Build Pages
-        run: yarn install && yarn build
+        run: export NODE_OPTIONS=--openssl-legacy-provider && yarn install && yarn build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
