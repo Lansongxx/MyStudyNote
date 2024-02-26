@@ -7,7 +7,7 @@ set -e
 yarn build
 
 # 进入生成的文件夹
-mv docs/.vuepress/dist ./dist
+cd docs/.vuepress/dist
 
 git add -A
 git commit -m 'deploy'
@@ -15,3 +15,4 @@ git commit -m 'deploy'
 # 如果发布到 https://<USERNAME>.github.io/<REPO>
 git push -f git@github.com:Lansongxx/MyStudyNote.git main:gh-pages
 
+cd -
