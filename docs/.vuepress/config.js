@@ -26,7 +26,7 @@ module.exports = {
         nav: [
             { text: '首页', link: '/' },
             {
-                text: 'Lansong的八股笔记',
+                text: 'Lansong',
                 items: [
                     { text: 'Github', link: 'https://github.com/Lansongxx' },
                 ]
@@ -78,7 +78,7 @@ module.exports = {
             // 页脚信息
             createYear: "2024", // 创建年份 (可选，author、authorLink 启动时必选)
             author: "Lansong", // 作者 (可选)
-            authorLink: "https://windliang.wang", // 作者链接 (可选)
+            authorLink: "https://github.com/Lansongxx", // 作者链接 (可选)
             beianLink: "https://beian.miit.gov.cn/", // 备案链接 (可选)
         },
         repo: {
