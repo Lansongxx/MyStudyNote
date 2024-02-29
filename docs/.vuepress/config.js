@@ -26,10 +26,16 @@ module.exports = {
         nav: [
             { text: '首页', link: '/' },
             {
-                text: 'Lansong',
+                text: '关于我',
                 items: [
                     { text: 'Github', link: 'https://github.com/Lansongxx' },
+                    { text: '知乎', link: 'https://www.zhihu.com/people/icand'},
+                    { text: 'Codeforces', link: 'https://codeforces.com/profile/Lansong'},
                 ]
+            },
+            {
+                text: '八股交流群',
+                link: 'http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=6ymyoBULBCcSPpH6bDPzPJbVnBXXytc8&authKey=3mjoM4lMl8vVKqX5iyumC24j%2FT5StPSIM%2BBNB4cxWyZZ%2B4xPWWmD2Tlp4cfjVXYF&noverify=0&group_code=747928275'
             }
         ],
         sidebar: [
