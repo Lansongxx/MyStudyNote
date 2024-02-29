@@ -255,10 +255,11 @@
 ## 39.sync.map底层结构
 <details>
   <summary>答案</summary>
+    <p>sync map的底层是一个只读的map和一个可读可写的map，访问只读的map不需要加锁，实现了读写分离，</p>
     <p>sync.Map包含read,dirty,misses,mu字段，read字段包括一个map和amend变量，amend变量表示dirty中是否存在read中不存在的元素，read表示一个只读的map，不需要加锁，dirty就是一个map,它是可读可写的，它的读写操作都要加锁，misses记录了在read中访问不到，去访问dirty的次数，如果该次数超过了dirty的长度时，会将会dirty赋值给read，此时read中被删除的key才真正被释放。mu表示互斥锁。</p>
-    <p>在读取数据的时候，会先去read中读取，如果读到了则直接返回，否则会加锁再读一次，已防止在加锁之前其他协程写入了read，否则去dirty中读，并增加misses。</p>
-    <p>在写数据的时候，会先去read中读取，如果读到了并且不为已删除，那么就直接修改指针，否则加锁再读一次，如果读到了并且是已删除，则改为nil，并写入dirty，因为此时dirty中没有该元素，然后再修改指针。如果没读到，则直接去dirty中读，如果读到了就修改指针，如果没读到，此时判断dirty和read是否相同，如果相同则刷新一次dirty，将read中nil的值忽略掉，然后写入元素。</p>
-    <p>当删除数据的时候，会先去read中读取，如果读到了则将其修改为nil,否则加锁再读一次，如果还没读到并且ammend为true就去dirty中读，如果读到了就将其直接删除。</p>
+    <p>在读取数据的时候，会先去read中读取，如果读到了则直接返回，否则去dirty中读，并增加misses。</p>
+    <p>在写数据的时候，如果key还存在或只是被软删除，则只需要在read map上进行cas操作，实现无锁更新，因为存储的是指针，dirty map 也会同步更新。否则需要加锁插入dirty map，并增加misses，如果misses达到dirty map 的长度，则会将dirty map 和 read map进行轮换，并将dirty map 置空，并将其中软删除的值彻底删除</p>
+    <p>在删除数据时，如果key在read map中，则进行软删除，否则直接去dirty map中彻底删除</p>
     <p>由此可见sync.Map适用于读多写少的场景，但是使用的时候需要注意，key被delete的时候并没有被释放，只有当misses到达dirty的长度时才会释放。</p>
 </details>
 
@@ -376,7 +377,7 @@
 ## 56.for range 中赋值的变量，这个变量指向的是真实的地址吗，还是临时变量
 <details>
   <summary>答案</summary>
-  <p>for range 本质上是使用了一个变量保存了值，它是一个临时变量</p>
+  <p>for range 本质上是在for range外面使用了一个变量保存了值，然后不断将值复制给这个变量，指向的地址都是相同的</p>
 </details>
 
 ## 54.如果在for range里面有一个函数，这个函数需要传一个指针，这时候应该怎么写？
@@ -388,13 +389,16 @@
 ## 55.Context了解吗，介绍一下它接口里的几个方法
 <details>
   <summary>答案</summary>
-  <p>Context是一个接口，需要实现Err用于返回错误，Deadline，用于返回是否会被取消，以及自动取消时间。Value()获取key对应的value，Done用于返回一个只读的chan，用于判断context是否被取消。然后context库提供了几个方法，首先，我们需要理解到，context的结构，本质上是一颗树。而WihtValue是链表结构，用WithValue添加key本质上是不断嵌套结构体。WithTimeOut就是调用了WithDeadline计算了一个超时时间,WithDeadline就是创建了一个timeCtx，里面包含了一个计时器，cancelCtx,超时时间，在超时之后，自动调用cancel函数。cancelCtx包括了一个Context,children，mu，done，err，cause，cancelCtx是对context的封装,children是存储了儿子的cancelCtx，mu用于保证线程安全，done是用于保存关闭信号的通道，err用于保存错误,cause用于保存错误的原因</p>
+  <p>Context是一个接口，包含几个方法,Err,Deadline,Value,Done。Err用于返回错误，Deadline用于返回是否会被取消，以及自动取消时间。Value()获取key对应的value，Done用于返回一个只读的chan，用于判断context是否被取消</p>
+  <p>valueCtx则是包含了父亲的context并存储了一个key和对应的value</p>
+  <p>cancelCtx则是包含了父亲的context，并存储了儿子节点的信息，如果当前ctx被取消，也会将儿子节点一并取消</p>
+  <p>timeCtx包含一个定时器和超时时间，还内嵌了一个cancelCtx继承了其方法，能够在超时后调用cancelCtx的方法将其取消</p> 
 </details>
 
 ## 56.waitgroup 的底层原理是什么 ？ 
 <details>
   <summary>答案</summary>
-  <p>waitgroup是一个结构体包含3个字段，noCopy，state,sema。noCopy用于复制go vet工具检查waitgroup是否被复制。state的高32位用于存储计数值，低32位用于存储waiter的计数值，Add通过增加计数值来实现，Wait通过循环查询计数值是否为0来实现，sema用于阻塞和唤醒waiter</p>
+  <p>waitgroup的底层就是维护一个信号量和等待者的数量waiter和需要等待的数量counter。信号量负责唤醒线程和挂起协程。这里使用一个无锁优化，将waiter和counter合并在一个字段上，因为在修改waiter和counter的时候要保证并发安全，将其绑定在一起可以使用cas来避免加锁，提高效率</p>
 </details>
 
 ## 57.goroutine并发控制怎么做 ？
@@ -420,8 +424,8 @@
   <summary>答案</summary>
   <p>1.首先根据select内部的语句进行优化，比如，没有case，没有default，只有一个case，都有不同的优化</p>
   <p>2.然后将不同的case封装成一个结构体scase</p>
-  <p>3.然后生成一个随机的遍历顺序和加锁顺序，以能够公平的访问每个chan,避免饥饿。然后按照生成的加锁顺序将所有的chan锁住</p>
-  <p>4.根据生成的遍历顺序，遍历所有的case，查看是否有可以立刻处理的chan，如果有，直接获取对应的索引并返回,否则将当前协程封装成一个sudog，然后写入对应的等待发送队列和等待接收队列.然后将当前协程挂起</p>
+  <p>3.然后生成一个随机的遍历顺序和按锁地址确定加锁顺序，以能够公平的访问每个chan,避免饥饿。按锁的地址来确定加锁顺序，以避免死锁的发生，然后按照生成的加锁顺序将所有的chan锁住</p>
+  <p>4.根据生成的遍历顺序，遍历所有的case，查看是否有可以立刻处理的chan，如果有，直接获取对应的索引并返回,否则将当前协程封装成一个sudog，然后写入对应的等待发送队列或等待接收队列.然后将当前协程挂起</p>
   <p>5.协程被唤醒后，找到可以直接处理的case，返回对应的索引</p>
 </details>
 
@@ -431,22 +435,28 @@
   <p>go的csp模型是通过goroutine和channel实现，goroutine负责实现并发执行，而channel实现goroutine之间的协调和通信</p>
 </details>
 
-## 61.Golang的Pool的结构体 
+## 61.go pool底层原理  
 <details>
   <summary>答案</summary>
-  <p>pool是一个结构体，它包含多个字段，nocopy，local,localsize,victim,victimsize，nocopy用来表示该结构体不可拷贝，local表示本地对象池，localsize记录的是本地对象池的大小，local记录了localpool数组的地址，每个P对应一个localpool，localpool是一个结构体，包含poolLocalInternal和pad，pad是填充字段，用于内存对齐，poolLocalInternal是结构体，里面包含一个私有对象和共享链表，每个链表元素是一个ringbuffer和首尾指针,存储了多个对象。使用ringbuffer是为了提高访问速度。victim是用于存储上一轮的local。当调用Get函数时，会先从local的私有对象获取，如果没有，则会从local中当前P对应的ringbuffer中拿，如果没有的话，会去其他P的ringbuffer中拿，如果没有的话，会去victim中拿，其中，为了防止因为go的抢占式调度而导致当前的P被抢占，会使用pin函数将其锁定</p>
+  <p>go pool 的底层是一个本地对象池和一个上一轮的本地对象池，它利用了GMP的特性，一个M绑定在一个P上，所以本地对象池的数量就是P的数量，这样可以减少并发的情况。然后记录上一轮的本地对象池，是一种牺牲者机制，因为每次gc前就会将本地对象池清空，但是如果直接清空，会导致内存波动比较大，所以需要有使用牺牲者机制来缓冲</p>
+  <p>本地对象池是一个链表+环形数组的结构，而环形数组的首尾指针的存储，使用了无锁优化，因为如果不同的P同时修改head和tail会导致并发冲突，所以我们可以将其合并到一个字段上，然后使用cas来确保只会有一个修改成功</p>
+  <p>当需要取对象时，首先需要调用pin函数，将当前的p锁定，以避免hand off机制将P与M分离，然后从本地对象池的私有对象中取，这样可以避免从共享对象池中取的繁琐操作。如果没有则去本地对象池中取，要从队头取，如果也没有，则去其他P的本地对象池中取，从队尾取，这样可以尽可能的减少并发冲突。如果还没有则去上一轮的本地对象池中取，如果还没有则New一个新的</p>
+  <p>当需要放入对象时，首先需要调用pin函数，然后尝试放入私有对象，如果已经存在，则放入本地对象池中，如果链表头的环形数组已满，则创建一个长度为上一个环形数组大小两倍的数组，从队头写入</p>
 </details>
 
 ## 62.interface  
 <details>
   <summary>答案</summary>
-  <p>接口分为iface和eface，eface是一个空接口，所有类型都实现了这个接口 iface包括data和itab，data记录了接口值的地址，itab记录了接口的相关信息，itab包括interfacetype，_type,fun,_,hash。interfacetype记录了接口的类型，interfacetype包括_type，pkgpath，mhdr，_type记录了接口类型的信息，pkgpath记录了接口的包路径，mhdr记录了接口方法对应的名字和类型，_type记录了该类型实例所占用的内存大小，该类型中指针数据的大小，类型的哈希值，反射相关等变量，fun是一个可变数组，记录了具体的类型实现接口方法的函数地址.判断某个类型是否实现了某个接口，因为go已经将方法排好了序，所以双指针即可</p>
+  <p>接口分为iface和eface，eface是一个空接口，所有类型都实现了这个接口</p>
+  <p>iface包括data和itab，data记录了接口值的地址，itab记录了接口的相关信息，itab包括interfacetype，_type,fun,_,hash。interfacetype记录了接口的类型信息，interfacetype包括_type，pkgpath，mhdr，_type记录了接口类型，pkgpath记录了接口的包路径，mhdr记录了接口方法对应的名字和类型，_type记录了接口值的类型信息，包括记录了该类型实例所占用的内存大小，该类型中指针数据的大小，类型的哈希值，反射相关等变量，fun是一个可变数组，记录了具体的类型实现接口方法的函数地址.判断某个类型是否实现了某个接口，因为go已经将方法排好了序，所以双指针即可</p>
+  <p>eface包括data和type,data记录了接口值的地址，type记录了接口值的类型 </p>
 </details>
 
 ## 63.反射原理以及那些场景会用到反射 ？
 <details>
   <summary>答案</summary>
-  <p>反射本质上是通过读取interface读取变量内部的值和类型，reflect包含两个类型type和value，type记录通过读取_type值来实现的，value则是结合了_type和data，本质上是通过值转为unsafe.Pointer然后转成空接口获取对应的信息。反射一般用于数据库orm，访问结构体的内部字段，结构体tag的处理，自定义序列化和反序列化逻辑，动态方法的调用</p>
+  <p>反射本质上是通过读取interface读取变量内部的值和类型，reflect包含两个类型type和value，type记录通过读取_type值来实现的，value则是结合了_type和data，本质上是通过将值的地址转为unsafe.Pointer然后转成空接口获取对应的信息</p>
+  <p>反射一般用于数据库orm，访问结构体的内部字段，结构体tag的处理，自定义序列化和反序列化逻辑，动态方法的调用</p>
 </details>
 
 ## 64.值接收者和指针接收者有什么区别？
