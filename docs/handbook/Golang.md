@@ -459,8 +459,30 @@
   <p>反射一般用于数据库orm，访问结构体的内部字段，结构体tag的处理，自定义序列化和反序列化逻辑，动态方法的调用</p>
 </details>
 
-## 64.值接收者和指针接收者有什么区别？
+## 64.值接收者和指针接收者Answer：defer常用于成对的操作，比如文件打开后要关闭、锁的申请和释放、sync.WaitGroup跟踪的goroutine的计数器的释放等。为了确保资源被释放，可以结合defer一起使用，避免在代码的各种条件分支里去释放资源，容易遗漏和出错。有什么区别？
 <details>
   <summary>答案</summary>
   <p>一般值接收者的方法不会改变接收者的属性 指针接收者的方法一般会改变接收者的属性或接收者比较大 无论你的接收者是指针还是值，都可以调用，因为编译器会自动帮你转成对应的接收者。但是当转为指针接收者时，必须满足结构者可寻址</p>
+</details>
+
+## 65.defer相比在函数的最后执行有什么优势
+<details>
+  <summary>答案</summary>
+<p>避免代码逻辑混乱，防止遗漏</p>
+</details>
+
+## 66.GMP G的数量，M的数量，P的数量受到什么的限制?
+<details>
+<summary>答案</summary>
+<p>G是协程，所以G的数量可能受到内存的限制，因为每个协程的数据结构都是要占用系统内存的，但是可以通过开启swap机制来解决</p>
+<p>M的数量受到系语言设定(10000)，debug.SetMaxThreads限制</p>
+<p>P的数量runtime.GOMAXPROCS限制</p>
+</details>
+
+## 67.如何控制协程的生命周期?
+<details>
+<summary>答案</summary>
+<p>1.channel</p>
+<p>2.context</p>
+<p>3.waitgroup</p>
 </details>

@@ -78,6 +78,11 @@ module.exports = {
                 title: "Golang",
                 path: '/handbook/Golang',
                 collapsable: false,
+            },
+            {
+                title: "算法与数据结构",
+                path: '/handbook/算法与数据结构',
+                collapsable: false,
             }
         ],
         footer: {
