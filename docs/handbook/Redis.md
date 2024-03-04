@@ -223,15 +223,6 @@
     <p>将调用 epoll_ctl() 将 listen socket 加入到 epoll，同时注册「连接事件」处理函数</p>
 </details>
 
-## 31.Redis初始化会做些什么工作？
-<details>
-    <summary>答案</summary>
-    <p>Redis 初始化的时候，会做下面这几件事情</p>
-    <p>首先，调用 epoll_create() 创建一个 epoll 对象和调用 socket() 创建一个服务端 socket</p>
-    <p>然后，调用 bind() 绑定端口和调用 listen() 监听该 socket</p>
-    <p>将调用 epoll_ctl() 将 listen socket 加入到 epoll，同时注册「连接事件」处理函数</p>
-</details>
-
 ## 32.什么是IO多路复用？
 <details>
     <summary>答案</summary>
@@ -243,5 +234,5 @@
     <summary>答案</summary>
     <p>Redis的大部分操作都在内存中完成，并且采用了高效的数据结构，因此 Redis 瓶颈可能是机器的内存或者网络带宽，而并非 CPU，既然 CPU 不是瓶颈，那么自然就采用单线程的解决方案了。</p>
     <p>Redis 采用单线程模型可以避免了多线程之间的竞争，省去了多线程切换带来的时间和性能上的开销，而且也不会导致死锁问题。</p>
-    <p>Redis 采用了 I/O 多路复用机制处理大量的客户端 Socket 请求，IO 多路复用机制是指一个线程处理多个 IO 流，就是我们经常听到的 select/epoll 机制。简单来说，在 Redis 只运行单线程的情况下，该机制允许内核中，同时存在多个监听 Socket 和已连接 Socket。内核会一直监听这些 Socket 上的连接请求或数据请求。一旦有请求到达，就会交给 Redis 线程处理，这就实现了一个 Redis 线程处理多个 IO 流的效果。</p>
+    <p>Redis 采用了 I/O 多路复用机制处理大量的客户端 Socket 请求，IO 多路复用机制是指一个线程处理多个 IO 流。</p>
 </details>
