@@ -130,10 +130,7 @@ follower 更新 follower hw = min(leader hw, follower local leo)
 <details>
 <summary>答案</summary>
 <p>
-1.kafka的消息是按主题分类的，每个主题的数据文件又是分区存储的，每个分区的数据又是分段存储的，kafka为每个段的数据建立了稀疏索引，当需要查找一个数据时，通过二分查找找到对应的段，然后通过稀疏索引，找到他在文件中的位置，稀疏索引是每隔4KB就添加一个索引。
-2.Kafka还采用了pagecache，由操作系统负责写入磁盘，减少了磁盘IO的消耗
-3.kafka还采用了零拷贝技术,使用sendfile+pagecache，直接将数据从pagecache发送到socket，然后拷贝到网卡，避免了重复复制数据，提高了性能
-4.Kafka采用了顺序读写，有效的降低了寻址时间，提高了效率
+kafka的消息是按主题分类的，每个主题的数据文件又是分区存储的，每个分区的数据又是分段存储的，每个分区由包含一个主副本，零到多个从副本，kafka为每个段的数据建立了稀疏索引，当需要查找一个数据时，通过二分查找找到对应的段，然后通过稀疏索引，找到他在文件中的位置，稀疏索引是每隔4KB就添加一个索引。
 </p>
 </details>
 
@@ -235,4 +232,19 @@ follower 更新 follower hw = min(leader hw, follower local leo)
 <details>
 <summary>答案</summary>
 <p>高吞吐量，低延迟。持久性</p>
+</details>
+
+26.kafka的应用场景
+<details>
+<summary>答案</summary>
+<p>1.日志聚合</p>
+<p>2.消息队列</p>
+<p>3.实时流处理</p>
+</details>
+
+27.kafka的负载均衡是怎么做的？
+<details>
+<summary>答案</summary>
+<p>1.每个主题有多个分区，分布在不同的broker上，每次写入数据时，如果没指定分区，会通过轮询来选择分区，从而实现负载均衡</p>
+<p>2.消费者端会将每个分区均匀的分配到同一个消费组中的不同消费者，当消费者发生变化时，会通过rebalance机制实现重新负载均衡</p>
 </details>

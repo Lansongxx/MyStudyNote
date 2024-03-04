@@ -26,6 +26,7 @@
     <p>6.HyperLogLog 常用于大量数据的基数统计，例如网页浏览量统计</p>
     <p>7.GEO 用于地理位置信息存储，例如滴滴叫车，附近的人</p>
     <p>8.Stream 用于消息队列，支持消费组和自动生成全局唯一ID</p>
+    <p>9.hash 用于缓存对象，缓存购物车</p>
 </details>
 
 ## 4.Redis是单线程的吗?
@@ -212,15 +213,6 @@
     <p>3.hash redis的hash在元素个数少于512并且所有值小于64字节时，基于listpack实现，listpack沿用了ziplist的紧凑布局，通过不存在上一个元素的长度避免了连锁更新的问题，通过encoding记录了元素的数据类型和长度，通过element-tot-len记录encoding和data的长度，从而支持方向遍历，否则会采用哈希表，哈希表底层存储了两个字典，一个用于扩容,会在必要的时候进行扩容和缩容，rehash</p>
     <p>4.set redis的set，在元素类型都是int并且元素个数不超过512的时候，会采用整数集合，整数集合的底层是一个有序数组。否则采用哈希表</p>
     <p>5.zset zset在元素个数小于128并且每个元素的值都小于64字节时，采用listpack，否则采用跳表。跳表是一个有序数据结构，它通过在每个节点维护多个指向其他节点指针，从而达到快速访问节点的目的</p>
-</details>
-
-## 31.Redis初始化会做些什么工作？
-<details>
-    <summary>答案</summary>
-    <p>Redis 初始化的时候，会做下面这几件事情</p>
-    <p>首先，调用 epoll_create() 创建一个 epoll 对象和调用 socket() 创建一个服务端 socket</p>
-    <p>然后，调用 bind() 绑定端口和调用 listen() 监听该 socket</p>
-    <p>将调用 epoll_ctl() 将 listen socket 加入到 epoll，同时注册「连接事件」处理函数</p>
 </details>
 
 ## 31.Redis初始化会做些什么工作？
