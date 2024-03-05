@@ -83,6 +83,11 @@ module.exports = {
                 title: "算法与数据结构",
                 path: '/handbook/算法与数据结构',
                 collapsable: false,
+            },
+            {
+                title: "面经",
+                path: '/handbook/面试经验',
+                collapsable: false,
             }
         ],
         footer: {
