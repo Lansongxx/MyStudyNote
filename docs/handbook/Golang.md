@@ -536,7 +536,6 @@
 <p></p>
 </details>
 
-
 ## 75.gmp的底层原理
 <details>
 <summary>答案</summary>
@@ -556,3 +555,58 @@
 <p>3.正常调度：g中的执行任务已经完成，就会设置为go_dead状态，发起新一轮的调度</p>
 <p>4.抢占调度：如果g执行系统调用超过指定时间，并且全局的p资源比较紧缺，就会将p和m进行解除绑定，然后去寻找空闲的m，如果没有空闲的m那就创建一个新的m，如果有则直接与其绑定</p>
 </details>
+
+## 77.sync.Cond的底层原理
+<details>
+<summary>答案</summary>
+<p>Cond通过checker(防止在运行期间拷贝)和noCopy(防止在编译期拷贝)实现不可复制，通过Locker实现阻塞操作，notify是一个阻塞链表，分别存储了等待的goroutine的数量，下一个被唤醒的goroutine的索引，为了防止并发冲突的锁，链表头指针，链表尾指针</p>
+<p>一般用于多个协程等待，一个协程通知的场景</p>
+</details>
+
+## 78.sync.Once的底层原理
+<details>
+<summary>答案</summary>
+<p>Once的底层由一个变量记录是否已经执行过，和一个锁保证线程安全</p>
+</details>
+
+## 79.singleFlight
+<details>
+<summary>答案</summary>
+<p>singleFlight是基于waitgroup实现的，使用map记录了对应key同一时间的响应和锁保证并发安全，如果执行函数时，发现已经存在于map中，则调用waitgroup的wait函数等待，然后从map中拿到返回值。如果不存在与map中则创建响应，并调用函数，完成后将响应从key从map中删除。并将结果发送给调用doChan的协程</p>
+</details>
+
+
+## 80.sync.Mutex
+<details>
+<summary>答案</summary>
+<p>Locker的底层就是一个状态值和信号量。信号量用于挂起和唤醒协程，该状态值是一个复合字段，包括locked(该锁是否被持有),woken(是否有协程因为锁释放而被唤醒，保证在锁释放时只会唤醒一个真在等待的协程，减少上下文切换),starving(是否处于饥饿状态，饥饿状态是为了解决新的来协程先拿到锁，而导致等待的协程一致拿不到锁，当协程等待时间超过1ms会进入饥饿模式，一个协程获取到锁，并且处于队尾或等待时间少于1ms，则回到正常模式),waitercount(等待的协程的数量)</p>
+</details>
+
+## 81.sync.RMutex
+<details>
+<summary>答案</summary>
+<p>基于Mutex实现，并记录了真在read的数量，等待read的数量，read的信号量(用于挂起和唤醒read协程),write的信号量(用于挂起和唤醒write协程)</p>
+</details>
+
+## 82.go内存模型原理
+<details>
+<summary>答案</summary>
+<p>go将对象分成微对象(size<16B)，小对象(32<=size<=32KB)，大对象(size>32KB)，不同对象采用不同的内存分配策略</p>
+<p>page是go最小的存储党员，为8KB。</p>
+<p>mspan是go最小的管理单元，是连续的若干个page的集合。从8KB到80KB被划分成67种不同的规格，根据对象的大小映射到不同规格的mspan中，从中获取内存()，同规格的mspan内部有一个互斥锁，避免并发冲突，mspan通过bitmap快速找到空闲内存块</p>
+<p>mcache是每个P独有的缓存，因此不需要锁。mcache缓存了带指针和不带指针的所有规格的mspan，共136个。还包含一个tiny对象分配器，用于处理微对象</p>
+<p>mcentral是中心缓存，每个mcentral存储了一种规格的mspan，并包含了两个链表，用于记录空的mspan列表和满的mspan列表。每个mcentral包含一个互斥锁</p>
+<p>mheap是go对于堆的抽象，以页(8KB)为单位，作为最小的存储单元,将连续的页组装成mspan，基于bitmap表示页的使用情况。通过heapArena聚合页，记录了页到mspan的映射信息。建立空闲页基数树索引来快速查找空闲页</p>
+<p>对于微对象申请内存：</p>
+<p>1.从所在P的mcache的tiny分配器取内存。</p>
+<p>2.根据size对应的mspan规格，从所在p的mcache中取内存</p>
+<p>3.根据size对应的mspan规格，从mcentral中取mspan填充到mcache中，然后从mspan中取内存</p>
+<p>4.根据size对应的mspan规格，从mheap中的页分配器中取空闲页组装成mspan填充到mcache中，然后从mspan中取内存</p>
+<p>5.mheap向操作系统申请内存更新页分配器的索引信息，并执行4</p>
+<p>对于小对象申请内存从2开始</p>
+<p>对于大对象的申请内存从4开始</p>
+<p>当mcache对应的mspan中的内存不够用了的时候会触发GC或申请大对象时会触发GC</p>
+<p>mheap包含2^14颗基数树，每颗树聚合了16GB页的使用情况，基数树中每个节点成为PallocSum记录了当前节点映射的bitmap范围中首端有多少个连续的0，尾端有多少个连续的0，最多有多少个连续的0。每个节点有8个儿子节点,一共5层。类似于线段树。查找空闲页时，从第一层开始，如果首部满足，则直接返回，但是内部最大满足，则进入下一层。否则尝试和尾部的下个节点拼接</p>
+</details>
+
+
