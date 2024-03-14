@@ -88,6 +88,11 @@ module.exports = {
                 title: "面经",
                 path: '/handbook/面试经验',
                 collapsable: false,
+            },
+            {
+                title: "微服务",
+                path: '/handbook/微服务',
+                collapsable: false,
             }
         ],
         footer: {
