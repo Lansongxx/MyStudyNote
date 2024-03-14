@@ -1,3 +1,4 @@
 .vuepress/dist
 .idea
 node_modules
+test
