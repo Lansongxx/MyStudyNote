@@ -85,8 +85,8 @@ module.exports = {
                 collapsable: false,
             },
             {
-                title: "面经",
-                path: '/handbook/面试经验',
+                title: "场景题",
+                path: '/handbook/场景题',
                 collapsable: false,
             },
             {
