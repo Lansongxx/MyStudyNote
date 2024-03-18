@@ -604,4 +604,22 @@
 <p>基于Mutex实现，并记录了正在read的数量，等待read的数量，read的信号量(用于挂起和唤醒read协程),write的信号量(用于挂起和唤醒write协程)</p>
 </details>
 
- 
+## 82.concurrent_map底层原理
+<details>
+<summary>答案</summary>
+<p>concurrent_map的底层是32个map，每个map包含一个读写锁，本质上就是对key进行分片，将key分散到32个不同的map中，从而实现小粒度加锁，减少锁竞争，因为要实现分片，因此key必须是string或提供分片方法。concurrent_map可以用在任何场景，解决了sync.map写多读少性能低下的问题</p>
+</details>
+
+## 83.如果有一个协程它是死循环，如何调度
+<details>
+<summary>答案</summary>
+<p>因为go的协程是协作式的，如果死循环中没有让渡或系统调用，则该协程会一直执行</p>
+</details>
+
+
+## 84.go的闭包及其作用
+<details>
+<summary>答案</summary>
+<p>闭包是一类特殊的函数，它引用了外部的函数的变量，该函数和引用的变量组成了闭包</p>
+<p>常用于封装和信息隐藏，实现回调函数</p>
+</details>
