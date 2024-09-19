@@ -463,3 +463,16 @@
 <p>3.innodb要缓存数据块，而myisam只用缓存索引块</p>
 <p>4.innodb寻址需要映射到块，再到行。而myisam记录的是文件的offset，寻址更快</p>
 </details>
+
+## 54.为什么有了binlog，还要redo log？
+<details>
+<summary>答案</summary>
+<p>1.binlog记录的是全量的数据，而redo log记录的是没有刷盘的数据，binlog并不知道哪些数据还没刷盘</p>
+<p>2.redo log 记录的是物理日志，即在哪个扇区的哪个内存页进行了修改。而 binlog 记录的是sql语句。一个sql语句会涉及多个扇区数据的修改，这并不是一个原子的操作，如果修改过程中宕机了，恢复会导致之前修改过的又被修改了一次。因此得使用物理日志来恢复</p>
+</details>
+
+## 55.为什么myisam不支持行级锁
+<details>
+<summary>答案</summary>
+<p>因为myisam的索引之间没有关联关系，加锁只能锁住数据，锁不住其他B+树的数据</p>
+</details>
